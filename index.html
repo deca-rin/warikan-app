@@ -3,19 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>割り勘アプリ</title>
+<title>🐷 わりかんアプリ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
 
   <header class="app-header">
-    <h1>割り勘アプリ</h1>
+    <h1><span class="emoji-wobble">🐷</span> わりかんアプリ <span class="emoji-wobble">💕</span></h1>
   </header>
 
   <!-- 画面1: 人数選択 -->
   <section id="screen-count" class="screen active">
-    <h2>1. メンバー人数を選択</h2>
+    <h2><span class="step-badge">STEP 1</span> 👥 メンバー人数を選択</h2>
     <div class="count-row">
       <button type="button" class="stepper" id="count-minus">−</button>
       <div class="count-input-wrap">
@@ -25,23 +28,23 @@
       <button type="button" class="stepper" id="count-plus">＋</button>
     </div>
     <p class="hint">人数を数字で発音してください（例：「4」）</p>
-    <button type="button" class="primary-btn" id="to-names">次へ</button>
+    <button type="button" class="primary-btn" id="to-names">次へ ▶</button>
   </section>
 
   <!-- 画面2: メンバー名入力 -->
   <section id="screen-names" class="screen">
-    <h2>2. メンバーの名前を入力</h2>
+    <h2><span class="step-badge">STEP 2</span> ✏️ メンバーの名前を入力</h2>
     <div id="name-inputs" class="name-inputs"></div>
     <div class="nav-row">
-      <button type="button" class="secondary-btn" id="back-to-count">戻る</button>
-      <button type="button" class="primary-btn" id="to-main">開始</button>
+      <button type="button" class="secondary-btn" id="back-to-count">◀ 戻る</button>
+      <button type="button" class="primary-btn" id="to-main">はじめる 🚀</button>
     </div>
   </section>
 
   <!-- 画面3: メイン(支払い記録・清算) -->
   <section id="screen-main" class="screen">
     <div class="card">
-      <h2>支払いを記録</h2>
+      <h2>💰 支払いを記録</h2>
       <div class="form-row">
         <label for="payer-select">支払った人</label>
         <select id="payer-select"></select>
@@ -60,27 +63,27 @@
           <button type="button" class="mic-btn" data-target="memo-input" title="音声で内容を入力">🎤</button>
         </div>
       </div>
-      <button type="button" class="primary-btn" id="add-expense">追加</button>
+      <button type="button" class="primary-btn" id="add-expense">＋ 追加する</button>
     </div>
 
     <div class="card">
-      <h2>メンバー各自の支払合計</h2>
+      <h2>📊 メンバー各自の支払合計</h2>
       <ul id="totals-list" class="totals-list"></ul>
     </div>
 
     <div class="card">
-      <h2>支払い履歴</h2>
+      <h2>🧾 支払い履歴</h2>
       <ul id="expense-list" class="expense-list"></ul>
       <p id="no-expense-msg" class="hint">まだ支払いが記録されていません</p>
     </div>
 
     <div class="nav-row">
-      <button type="button" class="secondary-btn" id="reset-app">最初からやり直す</button>
-      <button type="button" class="primary-btn" id="settle-btn">清算する</button>
+      <button type="button" class="secondary-btn" id="reset-app">🔄 最初からやり直す</button>
+      <button type="button" class="primary-btn" id="settle-btn">✨ 清算する</button>
     </div>
 
     <div class="card" id="settlement-result" hidden>
-      <h2>清算方法</h2>
+      <h2>🎉 清算方法</h2>
       <ul id="settlement-list" class="settlement-list"></ul>
       <p id="no-settlement-msg" class="hint" hidden>清算の必要はありません</p>
     </div>
