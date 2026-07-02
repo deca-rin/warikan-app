@@ -5,6 +5,29 @@
   let members = []; // [{ name }]
   let expenses = []; // [{ payerIndex, amount, memo }]
 
+  // ---- 永続化（アプリを閉じても履歴を保持） ----
+  const STORAGE_KEY = "warikan-app-state";
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ members, expenses }));
+  }
+
+  function clearState() {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || !Array.isArray(data.members) || data.members.length === 0) return null;
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // ---- 画面遷移 ----
   function showScreen(id) {
     document.querySelectorAll(".screen").forEach((el) => el.classList.remove("active"));
@@ -144,6 +167,7 @@
     }
     members = names.map((name) => ({ name }));
     expenses = [];
+    saveState();
     initMainScreen();
     showScreen("screen-main");
   });
@@ -224,6 +248,7 @@
       delBtn.textContent = "×";
       delBtn.addEventListener("click", () => {
         expenses.splice(idx, 1);
+        saveState();
         renderTotals();
         renderExpenses();
         settlementResult.hidden = true;
@@ -249,6 +274,7 @@
     expenses.push({ payerIndex, amount, memo });
     amountInput.value = "";
     memoInput.value = "";
+    saveState();
     renderTotals();
     renderExpenses();
     settlementResult.hidden = true;
@@ -258,7 +284,9 @@
     if (!confirm("最初からやり直しますか？記録した支払いは削除されます。")) return;
     members = [];
     expenses = [];
+    clearState();
     memberCountInput.value = 2;
+    settlementResult.hidden = true;
     showScreen("screen-count");
   });
 
@@ -326,4 +354,14 @@
 
     settlementResult.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+
+  // ---- 起動時に前回の履歴を復元 ----
+  const saved = loadState();
+  if (saved) {
+    members = saved.members;
+    expenses = saved.expenses;
+    memberCountInput.value = members.length;
+    initMainScreen();
+    showScreen("screen-main");
+  }
 })();
