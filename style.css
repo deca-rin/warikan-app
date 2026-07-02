@@ -18,6 +18,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   font-family: "M PLUS Rounded 1c", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
@@ -90,6 +94,31 @@ h2 {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.edit-icon-btn {
+  margin-left: auto;
+  border: 2px solid var(--border);
+  background: #fff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--border);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  flex-shrink: 0;
+}
+
+.edit-icon-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--border);
+}
+
+.totals-edit-row {
+  padding: 6px 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
 }
 
 .step-badge {

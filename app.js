@@ -182,6 +182,18 @@
   const settlementResult = document.getElementById("settlement-result");
   const settlementList = document.getElementById("settlement-list");
   const noSettlementMsg = document.getElementById("no-settlement-msg");
+  const editNamesBtn = document.getElementById("edit-names-btn");
+  const editNamesActions = document.getElementById("edit-names-actions");
+  const cancelNamesBtn = document.getElementById("cancel-names-btn");
+  const saveNamesBtn = document.getElementById("save-names-btn");
+  let editingNames = false;
+
+  function refreshPayerSelectLabels() {
+    members.forEach((m, i) => {
+      const opt = payerSelect.querySelector(`option[value="${i}"]`);
+      if (opt) opt.textContent = m.name;
+    });
+  }
 
   function initMainScreen() {
     payerSelect.innerHTML = "";
@@ -194,6 +206,8 @@
     amountInput.value = "";
     memoInput.value = "";
     settlementResult.hidden = true;
+    editingNames = false;
+    editNamesActions.hidden = true;
     renderTotals();
     renderExpenses();
   }
@@ -204,6 +218,36 @@
       totals[e.payerIndex] += e.amount;
     });
     totalsList.innerHTML = "";
+
+    if (editingNames) {
+      members.forEach((m, i) => {
+        const li = document.createElement("li");
+        li.className = "totals-edit-row";
+
+        const wrap = document.createElement("div");
+        wrap.className = "input-with-mic";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = `edit-name-${i}`;
+        input.value = m.name;
+
+        const micBtn = document.createElement("button");
+        micBtn.type = "button";
+        micBtn.className = "mic-btn";
+        micBtn.setAttribute("data-target", input.id);
+        micBtn.title = "音声で名前を入力";
+        micBtn.textContent = "🎤";
+
+        wrap.appendChild(input);
+        wrap.appendChild(micBtn);
+        li.appendChild(wrap);
+        totalsList.appendChild(li);
+        setupMicButton(micBtn);
+      });
+      return totals;
+    }
+
     members.forEach((m, i) => {
       const li = document.createElement("li");
       const nameSpan = document.createElement("span");
@@ -260,6 +304,33 @@
       expenseList.appendChild(li);
     });
   }
+
+  editNamesBtn.addEventListener("click", () => {
+    editingNames = !editingNames;
+    editNamesActions.hidden = !editingNames;
+    renderTotals();
+  });
+
+  cancelNamesBtn.addEventListener("click", () => {
+    editingNames = false;
+    editNamesActions.hidden = true;
+    renderTotals();
+  });
+
+  saveNamesBtn.addEventListener("click", () => {
+    members.forEach((m, i) => {
+      const input = document.getElementById(`edit-name-${i}`);
+      const newName = input.value.trim();
+      if (newName) m.name = newName;
+    });
+    saveState();
+    editingNames = false;
+    editNamesActions.hidden = true;
+    refreshPayerSelectLabels();
+    renderTotals();
+    renderExpenses();
+    settlementResult.hidden = true;
+  });
 
   document.getElementById("add-expense").addEventListener("click", () => {
     const payerIndex = parseInt(payerSelect.value, 10);
