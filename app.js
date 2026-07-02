@@ -3,7 +3,7 @@
 
   // ---- 状態 ----
   let members = []; // [{ name }]
-  let expenses = []; // [{ payerIndex, amount, memo }]
+  let expenses = []; // [{ payerIndex, amount, memo, participants: [memberIndex, ...] }]
 
   // ---- 永続化（アプリを閉じても履歴を保持） ----
   const STORAGE_KEY = "warikan-app-state";
@@ -22,7 +22,12 @@
       if (!raw) return null;
       const data = JSON.parse(raw);
       if (!data || !Array.isArray(data.members) || data.members.length === 0) return null;
-      return data;
+      const allIndices = data.members.map((_, i) => i);
+      const migratedExpenses = (data.expenses || []).map((e) => ({
+        ...e,
+        participants: Array.isArray(e.participants) && e.participants.length > 0 ? e.participants : allIndices,
+      }));
+      return { members: data.members, expenses: migratedExpenses };
     } catch (e) {
       return null;
     }
@@ -176,6 +181,7 @@
   const payerSelect = document.getElementById("payer-select");
   const amountInput = document.getElementById("amount-input");
   const memoInput = document.getElementById("memo-input");
+  const participantsListEl = document.getElementById("participants-list");
   const totalsList = document.getElementById("totals-list");
   const expenseList = document.getElementById("expense-list");
   const noExpenseMsg = document.getElementById("no-expense-msg");
@@ -186,7 +192,13 @@
   const editNamesActions = document.getElementById("edit-names-actions");
   const cancelNamesBtn = document.getElementById("cancel-names-btn");
   const saveNamesBtn = document.getElementById("save-names-btn");
+  const addMemberBtn = document.getElementById("add-member-btn");
+  const addMemberForm = document.getElementById("add-member-form");
+  const newMemberNameInput = document.getElementById("new-member-name");
+  const cancelAddMemberBtn = document.getElementById("cancel-add-member-btn");
+  const confirmAddMemberBtn = document.getElementById("confirm-add-member-btn");
   let editingNames = false;
+  let addingMember = false;
 
   function refreshPayerSelectLabels() {
     members.forEach((m, i) => {
@@ -195,7 +207,8 @@
     });
   }
 
-  function initMainScreen() {
+  function rebuildPayerSelect() {
+    const previousValue = payerSelect.value;
     payerSelect.innerHTML = "";
     members.forEach((m, i) => {
       const opt = document.createElement("option");
@@ -203,11 +216,39 @@
       opt.textContent = m.name;
       payerSelect.appendChild(opt);
     });
+    if (previousValue !== "" && members[previousValue]) payerSelect.value = previousValue;
+  }
+
+  function renderParticipantCheckboxes() {
+    participantsListEl.innerHTML = "";
+    members.forEach((m, i) => {
+      const label = document.createElement("label");
+      label.className = "participant-chip";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = i;
+      checkbox.checked = true;
+
+      const span = document.createElement("span");
+      span.textContent = m.name;
+
+      label.appendChild(checkbox);
+      label.appendChild(span);
+      participantsListEl.appendChild(label);
+    });
+  }
+
+  function initMainScreen() {
+    rebuildPayerSelect();
     amountInput.value = "";
     memoInput.value = "";
     settlementResult.hidden = true;
     editingNames = false;
     editNamesActions.hidden = true;
+    addingMember = false;
+    addMemberForm.hidden = true;
+    renderParticipantCheckboxes();
     renderTotals();
     renderExpenses();
   }
@@ -281,6 +322,13 @@
         memoSpan.textContent = e.memo;
         info.appendChild(memoSpan);
       }
+      if (e.participants.length < members.length) {
+        const participantsSpan = document.createElement("span");
+        participantsSpan.className = "expense-participants";
+        const names = e.participants.map((i) => (members[i] ? members[i].name : "")).filter(Boolean);
+        participantsSpan.textContent = `割り勘: ${names.join("・")}`;
+        info.appendChild(participantsSpan);
+      }
 
       const amountSpan = document.createElement("span");
       amountSpan.className = "expense-amount";
@@ -306,6 +354,8 @@
   }
 
   editNamesBtn.addEventListener("click", () => {
+    addingMember = false;
+    addMemberForm.hidden = true;
     editingNames = !editingNames;
     editNamesActions.hidden = !editingNames;
     renderTotals();
@@ -332,19 +382,57 @@
     settlementResult.hidden = true;
   });
 
+  addMemberBtn.addEventListener("click", () => {
+    editingNames = false;
+    editNamesActions.hidden = true;
+    addingMember = !addingMember;
+    addMemberForm.hidden = !addingMember;
+    newMemberNameInput.value = "";
+    renderTotals();
+  });
+
+  cancelAddMemberBtn.addEventListener("click", () => {
+    addingMember = false;
+    addMemberForm.hidden = true;
+  });
+
+  confirmAddMemberBtn.addEventListener("click", () => {
+    const name = newMemberNameInput.value.trim();
+    if (!name) {
+      alert("名前を入力してください");
+      return;
+    }
+    members.push({ name });
+    saveState();
+    addingMember = false;
+    addMemberForm.hidden = true;
+    rebuildPayerSelect();
+    renderParticipantCheckboxes();
+    renderTotals();
+    renderExpenses();
+  });
+
   document.getElementById("add-expense").addEventListener("click", () => {
     const payerIndex = parseInt(payerSelect.value, 10);
     const amount = parseInt(amountInput.value, 10);
     const memo = memoInput.value.trim();
+    const participants = Array.from(participantsListEl.querySelectorAll('input[type="checkbox"]:checked')).map((cb) =>
+      parseInt(cb.value, 10)
+    );
 
     if (!amount || amount <= 0) {
       alert("金額を正しく入力してください");
       return;
     }
+    if (participants.length === 0) {
+      alert("割り勘対象を1人以上選択してください");
+      return;
+    }
 
-    expenses.push({ payerIndex, amount, memo });
+    expenses.push({ payerIndex, amount, memo, participants });
     amountInput.value = "";
     memoInput.value = "";
+    renderParticipantCheckboxes();
     saveState();
     renderTotals();
     renderExpenses();
@@ -361,10 +449,23 @@
     showScreen("screen-count");
   });
 
+  // ---- 割り勘対象に応じた各自の公平負担額を計算 ----
+  function computeFairShares() {
+    const shares = members.map(() => 0);
+    expenses.forEach((e) => {
+      const participants = e.participants && e.participants.length > 0 ? e.participants : members.map((_, i) => i);
+      const base = Math.floor(e.amount / participants.length);
+      const remainder = e.amount % participants.length; // 先頭 remainder 人が +1円 負担して端数調整
+      participants.forEach((memberIndex, pos) => {
+        shares[memberIndex] += base + (pos < remainder ? 1 : 0);
+      });
+    });
+    return shares;
+  }
+
   // ---- 清算計算（できるだけ少ない送金回数になる貪欲法） ----
   document.getElementById("settle-btn").addEventListener("click", () => {
     const totals = renderTotals();
-    const n = members.length;
     const total = totals.reduce((a, b) => a + b, 0);
 
     if (total === 0) {
@@ -375,12 +476,10 @@
       return;
     }
 
-    const base = Math.floor(total / n);
-    const remainder = total % n; // 先頭 remainder 人が +1円 負担して端数調整
+    const fairShares = computeFairShares();
 
     const balances = members.map((m, i) => {
-      const fairShare = base + (i < remainder ? 1 : 0);
-      return { index: i, name: m.name, balance: totals[i] - fairShare };
+      return { index: i, name: m.name, balance: totals[i] - fairShares[i] };
     });
 
     const creditors = balances.filter((b) => b.balance > 0).map((b) => ({ ...b }));

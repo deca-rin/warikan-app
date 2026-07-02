@@ -63,15 +63,33 @@
           <button type="button" class="mic-btn" data-target="memo-input" title="音声で内容を入力">🎤</button>
         </div>
       </div>
+      <div class="form-row">
+        <label>割り勘対象（誰で分ける？）</label>
+        <div id="participants-list" class="participants-list"></div>
+      </div>
       <button type="button" class="primary-btn" id="add-expense">＋ 追加する</button>
     </div>
 
     <div class="card">
-      <h2>📊 メンバー各自の支払合計 <button type="button" class="edit-icon-btn" id="edit-names-btn" title="メンバー名を編集">✏️</button></h2>
+      <h2>📊 メンバー各自の支払合計</h2>
+      <div class="member-actions">
+        <button type="button" class="chip-btn" id="edit-names-btn">✏️ メンバー名変更</button>
+        <button type="button" class="chip-btn" id="add-member-btn">➕ メンバー追加</button>
+      </div>
       <ul id="totals-list" class="totals-list"></ul>
       <div class="nav-row" id="edit-names-actions" hidden>
         <button type="button" class="secondary-btn" id="cancel-names-btn">キャンセル</button>
         <button type="button" class="primary-btn" id="save-names-btn">💾 保存</button>
+      </div>
+      <div id="add-member-form" hidden>
+        <div class="input-with-mic">
+          <input type="text" id="new-member-name" placeholder="新しいメンバーの名前">
+          <button type="button" class="mic-btn" data-target="new-member-name" title="音声で名前を入力">🎤</button>
+        </div>
+        <div class="nav-row">
+          <button type="button" class="secondary-btn" id="cancel-add-member-btn">キャンセル</button>
+          <button type="button" class="primary-btn" id="confirm-add-member-btn">追加する</button>
+        </div>
       </div>
     </div>
 

@@ -96,21 +96,28 @@ h2 {
   flex-wrap: wrap;
 }
 
-.edit-icon-btn {
-  margin-left: auto;
+.member-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.chip-btn {
   border: 2px solid var(--border);
   background: #fff;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
+  color: var(--primary-dark);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   box-shadow: 0 3px 0 var(--border);
   transition: transform 0.08s ease, box-shadow 0.08s ease;
-  flex-shrink: 0;
 }
 
-.edit-icon-btn:active {
+.chip-btn:active {
   transform: translateY(3px);
   box-shadow: 0 0 0 var(--border);
 }
@@ -119,6 +126,47 @@ h2 {
   padding: 6px 0 !important;
   background: none !important;
   border-radius: 0 !important;
+}
+
+#add-member-form {
+  margin-top: 4px;
+}
+
+#add-member-form .input-with-mic {
+  margin-bottom: 10px;
+}
+
+.participants-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.participant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.participant-chip input {
+  accent-color: var(--primary-dark);
+  width: 16px;
+  height: 16px;
+}
+
+.participant-chip:has(input:checked) {
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  border-color: var(--primary-dark);
+  color: #fff;
 }
 
 .step-badge {
@@ -387,6 +435,11 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
 .expense-info .expense-memo {
   color: var(--muted);
   font-size: 12px;
+}
+
+.expense-info .expense-participants {
+  color: var(--accent);
+  font-size: 11px;
 }
 
 .expense-amount {
