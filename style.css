@@ -1,0 +1,305 @@
+:root {
+  --primary: #ff7a45;
+  --primary-dark: #e0632f;
+  --bg: #fdf6f0;
+  --card-bg: #ffffff;
+  --text: #333333;
+  --muted: #888888;
+  --border: #e8e0d8;
+  --danger: #d9534f;
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  min-height: 100vh;
+}
+
+.app-header h1 {
+  font-size: 22px;
+  text-align: center;
+  color: var(--primary-dark);
+  margin: 12px 0 24px;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  font-size: 16px;
+  margin: 0 0 14px;
+  color: var(--primary-dark);
+}
+
+.count-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.stepper {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.stepper:active {
+  background: var(--primary-dark);
+}
+
+.count-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#member-count {
+  width: 80px;
+  font-size: 24px;
+  text-align: center;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 6px 0 20px;
+}
+
+.primary-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary-btn:active {
+  background: var(--primary-dark);
+}
+
+.secondary-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.nav-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.nav-row > * {
+  flex: 1;
+}
+
+.name-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.name-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.name-input-row label {
+  width: 64px;
+  font-size: 13px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.input-with-mic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+input[type="text"], input[type="number"], select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+
+.mic-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.mic-btn.recording {
+  background: var(--danger);
+  border-color: var(--danger);
+  animation: pulse 1s infinite;
+}
+
+.mic-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(217, 83, 79, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0); }
+}
+
+.form-row {
+  margin-bottom: 14px;
+}
+
+.form-row label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.totals-list, .expense-list, .settlement-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.totals-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.totals-list li:last-child {
+  border-bottom: none;
+}
+
+.totals-list .amount {
+  font-weight: bold;
+  color: var(--primary-dark);
+}
+
+.expense-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.expense-list li:last-child {
+  border-bottom: none;
+}
+
+.expense-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.expense-info .expense-payer {
+  font-weight: bold;
+}
+
+.expense-info .expense-memo {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.expense-amount {
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+.delete-btn {
+  border: none;
+  background: none;
+  color: var(--danger);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.settlement-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settlement-list li:last-child {
+  border-bottom: none;
+}
+
+.settlement-list .arrow {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.settlement-list .settle-amount {
+  margin-left: auto;
+  font-weight: bold;
+  color: var(--primary-dark);
+}

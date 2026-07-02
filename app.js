@@ -1,0 +1,329 @@
+(function () {
+  "use strict";
+
+  // ---- 状態 ----
+  let members = []; // [{ name }]
+  let expenses = []; // [{ payerIndex, amount, memo }]
+
+  // ---- 画面遷移 ----
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach((el) => el.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  // ---- 音声入力 ----
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function toHalfWidthDigits(str) {
+    return str.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
+  }
+
+  function extractNumber(str) {
+    const normalized = toHalfWidthDigits(str).replace(/,/g, "");
+    const match = normalized.match(/\d+/);
+    return match ? match[0] : null;
+  }
+
+  function setupMicButton(button) {
+    if (!SpeechRecognitionCtor) {
+      button.disabled = true;
+      button.title = "このブラウザは音声入力に対応していません";
+      return;
+    }
+
+    button.addEventListener("click", () => {
+      const targetId = button.getAttribute("data-target");
+      const target = document.getElementById(targetId);
+      const numeric = button.getAttribute("data-numeric") === "true";
+
+      const recognition = new SpeechRecognitionCtor();
+      recognition.lang = "ja-JP";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      button.classList.add("recording");
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        if (numeric) {
+          const num = extractNumber(transcript);
+          if (num !== null) {
+            target.value = num;
+            target.dispatchEvent(new Event("change"));
+          }
+        } else {
+          target.value = transcript.replace(/[。、]+$/g, "");
+          target.dispatchEvent(new Event("change"));
+        }
+      };
+
+      recognition.onerror = () => {
+        button.classList.remove("recording");
+      };
+
+      recognition.onend = () => {
+        button.classList.remove("recording");
+      };
+
+      recognition.start();
+    });
+  }
+
+  document.querySelectorAll(".mic-btn").forEach(setupMicButton);
+
+  // ---- 画面1: 人数選択 ----
+  const memberCountInput = document.getElementById("member-count");
+
+  document.getElementById("count-minus").addEventListener("click", () => {
+    const v = Math.max(2, parseInt(memberCountInput.value || "2", 10) - 1);
+    memberCountInput.value = v;
+  });
+
+  document.getElementById("count-plus").addEventListener("click", () => {
+    const v = Math.min(20, parseInt(memberCountInput.value || "2", 10) + 1);
+    memberCountInput.value = v;
+  });
+
+  document.getElementById("to-names").addEventListener("click", () => {
+    let count = parseInt(memberCountInput.value, 10);
+    if (!count || count < 2) count = 2;
+    if (count > 20) count = 20;
+    memberCountInput.value = count;
+    buildNameInputs(count);
+    showScreen("screen-names");
+  });
+
+  // ---- 画面2: 名前入力 ----
+  const nameInputsContainer = document.getElementById("name-inputs");
+
+  function buildNameInputs(count) {
+    nameInputsContainer.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+      const row = document.createElement("div");
+      row.className = "name-input-row";
+
+      const label = document.createElement("label");
+      label.textContent = `メンバー${i + 1}`;
+
+      const wrap = document.createElement("div");
+      wrap.className = "input-with-mic";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = `member-name-${i}`;
+      input.placeholder = `名前を入力`;
+
+      const micBtn = document.createElement("button");
+      micBtn.type = "button";
+      micBtn.className = "mic-btn";
+      micBtn.setAttribute("data-target", input.id);
+      micBtn.title = "音声で名前を入力";
+      micBtn.textContent = "🎤";
+
+      wrap.appendChild(input);
+      wrap.appendChild(micBtn);
+      row.appendChild(label);
+      row.appendChild(wrap);
+      nameInputsContainer.appendChild(row);
+
+      setupMicButton(micBtn);
+    }
+  }
+
+  document.getElementById("back-to-count").addEventListener("click", () => {
+    showScreen("screen-count");
+  });
+
+  document.getElementById("to-main").addEventListener("click", () => {
+    const count = parseInt(memberCountInput.value, 10);
+    const names = [];
+    for (let i = 0; i < count; i++) {
+      const input = document.getElementById(`member-name-${i}`);
+      const name = input.value.trim() || `メンバー${i + 1}`;
+      names.push(name);
+    }
+    members = names.map((name) => ({ name }));
+    expenses = [];
+    initMainScreen();
+    showScreen("screen-main");
+  });
+
+  // ---- 画面3: メイン ----
+  const payerSelect = document.getElementById("payer-select");
+  const amountInput = document.getElementById("amount-input");
+  const memoInput = document.getElementById("memo-input");
+  const totalsList = document.getElementById("totals-list");
+  const expenseList = document.getElementById("expense-list");
+  const noExpenseMsg = document.getElementById("no-expense-msg");
+  const settlementResult = document.getElementById("settlement-result");
+  const settlementList = document.getElementById("settlement-list");
+  const noSettlementMsg = document.getElementById("no-settlement-msg");
+
+  function initMainScreen() {
+    payerSelect.innerHTML = "";
+    members.forEach((m, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = m.name;
+      payerSelect.appendChild(opt);
+    });
+    amountInput.value = "";
+    memoInput.value = "";
+    settlementResult.hidden = true;
+    renderTotals();
+    renderExpenses();
+  }
+
+  function renderTotals() {
+    const totals = members.map(() => 0);
+    expenses.forEach((e) => {
+      totals[e.payerIndex] += e.amount;
+    });
+    totalsList.innerHTML = "";
+    members.forEach((m, i) => {
+      const li = document.createElement("li");
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = m.name;
+      const amountSpan = document.createElement("span");
+      amountSpan.className = "amount";
+      amountSpan.textContent = `¥${totals[i].toLocaleString()}`;
+      li.appendChild(nameSpan);
+      li.appendChild(amountSpan);
+      totalsList.appendChild(li);
+    });
+    return totals;
+  }
+
+  function renderExpenses() {
+    expenseList.innerHTML = "";
+    noExpenseMsg.style.display = expenses.length === 0 ? "block" : "none";
+
+    expenses.forEach((e, idx) => {
+      const li = document.createElement("li");
+
+      const info = document.createElement("div");
+      info.className = "expense-info";
+      const payerSpan = document.createElement("span");
+      payerSpan.className = "expense-payer";
+      payerSpan.textContent = members[e.payerIndex].name;
+      info.appendChild(payerSpan);
+      if (e.memo) {
+        const memoSpan = document.createElement("span");
+        memoSpan.className = "expense-memo";
+        memoSpan.textContent = e.memo;
+        info.appendChild(memoSpan);
+      }
+
+      const amountSpan = document.createElement("span");
+      amountSpan.className = "expense-amount";
+      amountSpan.textContent = `¥${e.amount.toLocaleString()}`;
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "delete-btn";
+      delBtn.textContent = "×";
+      delBtn.addEventListener("click", () => {
+        expenses.splice(idx, 1);
+        renderTotals();
+        renderExpenses();
+        settlementResult.hidden = true;
+      });
+
+      li.appendChild(info);
+      li.appendChild(amountSpan);
+      li.appendChild(delBtn);
+      expenseList.appendChild(li);
+    });
+  }
+
+  document.getElementById("add-expense").addEventListener("click", () => {
+    const payerIndex = parseInt(payerSelect.value, 10);
+    const amount = parseInt(amountInput.value, 10);
+    const memo = memoInput.value.trim();
+
+    if (!amount || amount <= 0) {
+      alert("金額を正しく入力してください");
+      return;
+    }
+
+    expenses.push({ payerIndex, amount, memo });
+    amountInput.value = "";
+    memoInput.value = "";
+    renderTotals();
+    renderExpenses();
+    settlementResult.hidden = true;
+  });
+
+  document.getElementById("reset-app").addEventListener("click", () => {
+    if (!confirm("最初からやり直しますか？記録した支払いは削除されます。")) return;
+    members = [];
+    expenses = [];
+    memberCountInput.value = 2;
+    showScreen("screen-count");
+  });
+
+  // ---- 清算計算（できるだけ少ない送金回数になる貪欲法） ----
+  document.getElementById("settle-btn").addEventListener("click", () => {
+    const totals = renderTotals();
+    const n = members.length;
+    const total = totals.reduce((a, b) => a + b, 0);
+
+    if (total === 0) {
+      settlementResult.hidden = false;
+      settlementList.innerHTML = "";
+      noSettlementMsg.hidden = false;
+      noSettlementMsg.textContent = "支出がありません";
+      return;
+    }
+
+    const base = Math.floor(total / n);
+    const remainder = total % n; // 先頭 remainder 人が +1円 負担して端数調整
+
+    const balances = members.map((m, i) => {
+      const fairShare = base + (i < remainder ? 1 : 0);
+      return { index: i, name: m.name, balance: totals[i] - fairShare };
+    });
+
+    const creditors = balances.filter((b) => b.balance > 0).map((b) => ({ ...b }));
+    const debtors = balances.filter((b) => b.balance < 0).map((b) => ({ ...b, balance: -b.balance }));
+
+    creditors.sort((a, b) => b.balance - a.balance);
+    debtors.sort((a, b) => b.balance - a.balance);
+
+    const transactions = [];
+    let ci = 0;
+    let di = 0;
+    while (ci < creditors.length && di < debtors.length) {
+      const c = creditors[ci];
+      const d = debtors[di];
+      const amount = Math.min(c.balance, d.balance);
+
+      if (amount > 0) {
+        transactions.push({ from: d.name, to: c.name, amount });
+      }
+
+      c.balance -= amount;
+      d.balance -= amount;
+
+      if (c.balance === 0) ci++;
+      if (d.balance === 0) di++;
+    }
+
+    settlementResult.hidden = false;
+    settlementList.innerHTML = "";
+
+    if (transactions.length === 0) {
+      noSettlementMsg.hidden = false;
+      noSettlementMsg.textContent = "清算の必要はありません";
+    } else {
+      noSettlementMsg.hidden = true;
+      transactions.forEach((t) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${t.from}</span><span class="arrow">→</span><span>${t.to}</span><span class="settle-amount">¥${t.amount.toLocaleString()}</span>`;
+        settlementList.appendChild(li);
+      });
+    }
+
+    settlementResult.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+})();
