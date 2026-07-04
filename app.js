@@ -4,33 +4,47 @@
   // ---- 状態 ----
   let members = []; // [{ name }]
   let expenses = []; // [{ payerIndex, amount, memo, participants: [memberIndex, ...] }]
+  let roomCode = null;
 
-  // ---- 永続化（アプリを閉じても履歴を保持） ----
-  const STORAGE_KEY = "warikan-app-state";
+  // ---- グループ同期（Firebase Realtime Database） ----
+  const ROOM_STORAGE_KEY = "warikan-app-room-code";
 
-  function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ members, expenses }));
+  function rememberRoom(code) {
+    localStorage.setItem(ROOM_STORAGE_KEY, code);
   }
 
-  function clearState() {
-    localStorage.removeItem(STORAGE_KEY);
+  function forgetRoom() {
+    localStorage.removeItem(ROOM_STORAGE_KEY);
   }
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return null;
-      const data = JSON.parse(raw);
-      if (!data || !Array.isArray(data.members) || data.members.length === 0) return null;
-      const allIndices = data.members.map((_, i) => i);
-      const migratedExpenses = (data.expenses || []).map((e) => ({
-        ...e,
-        participants: Array.isArray(e.participants) && e.participants.length > 0 ? e.participants : allIndices,
-      }));
-      return { members: data.members, expenses: migratedExpenses };
-    } catch (e) {
-      return null;
-    }
+  function getRememberedRoom() {
+    return localStorage.getItem(ROOM_STORAGE_KEY);
+  }
+
+  function migrateExpenses(rawMembers, rawExpenses) {
+    const allIndices = rawMembers.map((_, i) => i);
+    return (rawExpenses || []).map((e) => ({
+      ...e,
+      participants: Array.isArray(e.participants) && e.participants.length > 0 ? e.participants : allIndices,
+    }));
+  }
+
+  function syncToFirebase() {
+    if (!roomCode) return;
+    window.WarikanSync.updateRoom(roomCode, { members, expenses });
+  }
+
+  function enterRoom(code) {
+    roomCode = code;
+    rememberRoom(code);
+    roomCodeDisplay.textContent = code;
+    window.WarikanSync.subscribeRoom(code, (data) => {
+      members = Array.isArray(data.members) ? data.members : [];
+      expenses = migrateExpenses(members, data.expenses);
+      memberCountInput.value = members.length || 2;
+      initMainScreen();
+      showScreen("screen-main");
+    });
   }
 
   // ---- 画面遷移 ----
@@ -99,6 +113,52 @@
 
   document.querySelectorAll(".mic-btn").forEach(setupMicButton);
 
+  // ---- 画面0: グループ作成/参加 ----
+  const roomCodeDisplay = document.getElementById("room-code-display");
+  const joinCodeInput = document.getElementById("join-code-input");
+  const joinGroupBtn = document.getElementById("join-group-btn");
+  const joinErrorMsg = document.getElementById("join-error-msg");
+  const copyRoomCodeBtn = document.getElementById("copy-room-code-btn");
+
+  document.getElementById("create-group-btn").addEventListener("click", () => {
+    showScreen("screen-count");
+  });
+
+  document.getElementById("back-to-start").addEventListener("click", () => {
+    showScreen("screen-start");
+  });
+
+  joinGroupBtn.addEventListener("click", async () => {
+    const code = joinCodeInput.value.trim().toUpperCase();
+    joinErrorMsg.hidden = true;
+    if (!code) return;
+
+    joinGroupBtn.disabled = true;
+    try {
+      const exists = await window.WarikanSync.roomExists(code);
+      if (!exists) {
+        joinErrorMsg.hidden = false;
+        return;
+      }
+      enterRoom(code);
+    } catch (e) {
+      alert("接続に失敗しました。通信状況を確認してもう一度お試しください。");
+    } finally {
+      joinGroupBtn.disabled = false;
+    }
+  });
+
+  copyRoomCodeBtn.addEventListener("click", () => {
+    if (!roomCode) return;
+    navigator.clipboard.writeText(roomCode).then(() => {
+      const original = copyRoomCodeBtn.textContent;
+      copyRoomCodeBtn.textContent = "✅ コピーしました";
+      setTimeout(() => {
+        copyRoomCodeBtn.textContent = original;
+      }, 1500);
+    });
+  });
+
   // ---- 画面1: 人数選択 ----
   const memberCountInput = document.getElementById("member-count");
 
@@ -162,7 +222,8 @@
     showScreen("screen-count");
   });
 
-  document.getElementById("to-main").addEventListener("click", () => {
+  const toMainBtn = document.getElementById("to-main");
+  toMainBtn.addEventListener("click", async () => {
     const count = parseInt(memberCountInput.value, 10);
     const names = [];
     for (let i = 0; i < count; i++) {
@@ -170,11 +231,17 @@
       const name = input.value.trim() || `メンバー${i + 1}`;
       names.push(name);
     }
-    members = names.map((name) => ({ name }));
-    expenses = [];
-    saveState();
-    initMainScreen();
-    showScreen("screen-main");
+    const newMembers = names.map((name) => ({ name }));
+
+    toMainBtn.disabled = true;
+    try {
+      const code = await window.WarikanSync.createRoom(newMembers);
+      enterRoom(code);
+    } catch (e) {
+      alert("グループの作成に失敗しました。通信状況を確認してもう一度お試しください。");
+    } finally {
+      toMainBtn.disabled = false;
+    }
   });
 
   // ---- 画面3: メイン ----
@@ -340,7 +407,7 @@
       delBtn.textContent = "×";
       delBtn.addEventListener("click", () => {
         expenses.splice(idx, 1);
-        saveState();
+        syncToFirebase();
         renderTotals();
         renderExpenses();
         settlementResult.hidden = true;
@@ -373,7 +440,7 @@
       const newName = input.value.trim();
       if (newName) m.name = newName;
     });
-    saveState();
+    syncToFirebase();
     editingNames = false;
     editNamesActions.hidden = true;
     refreshPayerSelectLabels();
@@ -403,7 +470,7 @@
       return;
     }
     members.push({ name });
-    saveState();
+    syncToFirebase();
     addingMember = false;
     addMemberForm.hidden = true;
     rebuildPayerSelect();
@@ -433,20 +500,22 @@
     amountInput.value = "";
     memoInput.value = "";
     renderParticipantCheckboxes();
-    saveState();
+    syncToFirebase();
     renderTotals();
     renderExpenses();
     settlementResult.hidden = true;
   });
 
   document.getElementById("reset-app").addEventListener("click", () => {
-    if (!confirm("最初からやり直しますか？記録した支払いは削除されます。")) return;
+    if (!confirm("グループから抜けて最初からやり直しますか？（グループのデータ自体は削除されません）")) return;
+    window.WarikanSync.unsubscribeRoom();
     members = [];
     expenses = [];
-    clearState();
+    roomCode = null;
+    forgetRoom();
     memberCountInput.value = 2;
     settlementResult.hidden = true;
-    showScreen("screen-count");
+    showScreen("screen-start");
   });
 
   // ---- 割り勘対象に応じた各自の公平負担額を計算 ----
@@ -525,13 +594,9 @@
     settlementResult.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // ---- 起動時に前回の履歴を復元 ----
-  const saved = loadState();
-  if (saved) {
-    members = saved.members;
-    expenses = saved.expenses;
-    memberCountInput.value = members.length;
-    initMainScreen();
-    showScreen("screen-main");
+  // ---- 起動時に前回参加していたグループへ自動再接続 ----
+  const rememberedRoom = getRememberedRoom();
+  if (rememberedRoom) {
+    enterRoom(rememberedRoom);
   }
 })();

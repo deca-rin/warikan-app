@@ -442,6 +442,36 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
   font-size: 11px;
 }
 
+.room-code-card {
+  background: linear-gradient(90deg, #eaf7ff, #f0ecff);
+}
+
+.room-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.room-code-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.room-code-value {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--primary-dark);
+}
+
+#screen-start .primary-btn,
+#screen-start .secondary-btn {
+  margin-top: 10px;
+}
+
 .expense-amount {
   font-weight: 800;
   color: var(--primary-dark);
