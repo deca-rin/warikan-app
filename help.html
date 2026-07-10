@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-i18n-title="help.pageTitle">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,75 +13,71 @@
 <div class="app">
 
   <header class="app-header">
-    <h1><span class="emoji-wobble">🐷</span> わりかんアプリ <span class="emoji-wobble">💕</span></h1>
+    <div class="header-row">
+      <h1><span class="emoji-wobble">🐷</span> <span data-i18n="app.title">わりかんアプリ</span> <span class="emoji-wobble">💕</span></h1>
+      <select id="lang-select" class="lang-select">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
+    </div>
   </header>
 
   <div class="card">
-    <h2>❓ 使い方ガイド</h2>
-    <p class="hint" style="margin-bottom:0;">旅行や飲み会など、複数回の支払いをみんなで割り勘するためのアプリです。</p>
+    <h2 data-i18n="help.guideTitle">❓ 使い方ガイド</h2>
+    <p class="hint" style="margin-bottom:0;" data-i18n="help.guideDesc">旅行や飲み会など、複数回の支払いをみんなで割り勘するためのアプリです。</p>
   </div>
 
   <div class="card">
-    <h2>🆕 グループを作る・参加する</h2>
-    <p><b>新しいグループを作る場合</b><br>
-    トップ画面で「新しいグループを作る」を選び、人数とメンバーの名前を入力すると、<b>6桁のグループコード</b>（例：<code>AB12CD</code>）が発行されます。</p>
-    <p><b>友達に招待されている場合</b><br>
-    トップ画面で「招待コードで参加する」を選び、教えてもらったグループコードを入力すると、そのグループのデータにそのまま接続できます。</p>
-    <p class="hint" style="margin-bottom:0;">グループコードを知っている人同士は、同じ支払いデータをリアルタイムで共有できます。誰かがスマホで支払いを追加すると、他のメンバーの画面にも自動で反映されます。</p>
+    <h2 data-i18n="help.groupTitle">🆕 グループを作る・参加する</h2>
+    <p data-i18n-html="help.groupCreate"><b>新しいグループを作る場合</b><br>トップ画面で「新しいグループを作る」を選び、人数とメンバーの名前を入力すると、<b>6桁のグループコード</b>（例：<code>AB12CD</code>）が発行されます。</p>
+    <p data-i18n-html="help.groupJoin"><b>友達に招待されている場合</b><br>トップ画面で「招待コードで参加する」を選び、教えてもらったグループコードを入力すると、そのグループのデータにそのまま接続できます。</p>
+    <p class="hint" style="margin-bottom:0;" data-i18n="help.groupHint">グループコードを知っている人同士は、同じ支払いデータをリアルタイムで共有できます。誰かがスマホで支払いを追加すると、他のメンバーの画面にも自動で反映されます。</p>
   </div>
 
   <div class="card">
-    <h2>👥 人数・名前の入力</h2>
-    <p>「＋」「−」ボタンでメンバー人数を選び、次の画面で一人ずつ名前を入力します。</p>
-    <p class="hint" style="margin-bottom:0;">入力欄の🎤ボタンを押すと音声入力ができます。人数や金額は数字をはっきり発音してください（例：「4」「3000」）。</p>
+    <h2 data-i18n="help.membersTitle">👥 人数・名前の入力</h2>
+    <p data-i18n="help.membersDesc">「＋」「−」ボタンでメンバー人数を選び、次の画面で一人ずつ名前を入力します。</p>
+    <p class="hint" style="margin-bottom:0;" data-i18n="help.membersHint">入力欄の🎤ボタンを押すと音声入力ができます。人数や金額は数字をはっきり発音してください（例：「4」「3000」）。</p>
   </div>
 
   <div class="card">
-    <h2>💰 支払いを記録する</h2>
-    <p>支払いが発生するたびに、以下を入力して「＋ 追加する」を押します。</p>
-    <p>
-      ・<b>支払った人</b>：実際にお金を払った人を選択<br>
-      ・<b>金額</b>：支払った金額（円）<br>
-      ・<b>内容</b>：メモ（任意、例：夕食代）<br>
-      ・<b>割り勘対象</b>：誰でその支払いを分けるかをチップで選択
-    </p>
-    <p class="hint" style="margin-bottom:0;">割り勘対象は初期状態で全員が選択されています（標準は全員割り勘）。一部のメンバーだけで割り勘したい支払いがあれば、チップをタップしてオン/オフを切り替えてください。</p>
+    <h2 data-i18n="help.recordTitle">💰 支払いを記録する</h2>
+    <p data-i18n="help.recordDesc">支払いが発生するたびに、以下を入力して「＋ 追加する」を押します。</p>
+    <p data-i18n-html="help.recordFields">・<b>支払った人</b>：実際にお金を払った人を選択<br>・<b>金額</b>：支払った金額（円）<br>・<b>内容</b>：メモ（任意、例：夕食代）<br>・<b>割り勘対象</b>：誰でその支払いを分けるかをチップで選択</p>
+    <p class="hint" style="margin-bottom:0;" data-i18n="help.recordHint">割り勘対象は初期状態で全員が選択されています（標準は全員割り勘）。一部のメンバーだけで割り勘したい支払いがあれば、チップをタップしてオン/オフを切り替えてください。</p>
   </div>
 
   <div class="card">
-    <h2>📊 メンバー各自の支払合計</h2>
-    <p>これまでに各メンバーが支払った金額の合計が表示されます。</p>
-    <p><b>✏️ メンバー名変更</b>：名前を入力し直して保存すると、これまでの履歴も新しい名前で表示されます。</p>
-    <p class="hint" style="margin-bottom:0;"><b>➕ メンバー追加</b>：旅行の途中から参加するメンバーがいる場合、ここで追加できます。追加したメンバーは、それ以降の支払いから割り勘対象に選べるようになります（過去の支払いには遡って含まれません）。</p>
+    <h2 data-i18n="help.totalsTitle">📊 メンバー各自の支払合計</h2>
+    <p data-i18n="help.totalsDesc">これまでに各メンバーが支払った金額の合計が表示されます。</p>
+    <p data-i18n-html="help.totalsEdit"><b>✏️ メンバー名変更</b>：名前を入力し直して保存すると、これまでの履歴も新しい名前で表示されます。</p>
+    <p class="hint" style="margin-bottom:0;" data-i18n-html="help.totalsAdd"><b>➕ メンバー追加</b>：旅行の途中から参加するメンバーがいる場合、ここで追加できます。追加したメンバーは、それ以降の支払いから割り勘対象に選べるようになります（過去の支払いには遡って含まれません）。</p>
   </div>
 
   <div class="card">
-    <h2>🧾 支払い履歴</h2>
-    <p>記録した支払いが一覧で表示されます。一部のメンバーだけで割り勘した支払いには「割り勘：〇〇・△△」のように対象メンバーが表示されます。「×」ボタンで削除できます。</p>
+    <h2 data-i18n="help.historyTitle">🧾 支払い履歴</h2>
+    <p data-i18n="help.historyDesc">記録した支払いが一覧で表示されます。一部のメンバーだけで割り勘した支払いには「割り勘：〇〇・△△」のように対象メンバーが表示されます。「×」ボタンで削除できます。</p>
   </div>
 
   <div class="card">
-    <h2>✨ 清算する</h2>
-    <p>「清算する」ボタンを押すと、それぞれの支払い実績と割り勘対象をもとに、<b>誰が誰にいくら払えばよいか</b>が、送金の回数がなるべく少なくなる形で表示されます。</p>
+    <h2 data-i18n="help.settleTitle">✨ 清算する</h2>
+    <p data-i18n-html="help.settleDesc">「清算する」ボタンを押すと、それぞれの支払い実績と割り勘対象をもとに、<b>誰が誰にいくら払えばよいか</b>が、送金の回数がなるべく少なくなる形で表示されます。</p>
   </div>
 
   <div class="card">
-    <h2>🔄 グループを抜けて最初から</h2>
-    <p>この端末をグループから切り離し、トップ画面に戻ります。</p>
-    <p class="hint" style="margin-bottom:0;">グループ自体のデータは削除されません。他のメンバーはそのまま同じグループを使い続けられます。新しく別の旅行を始めたいときにお使いください。</p>
+    <h2 data-i18n="help.leaveTitle">🔄 グループを抜けて最初から</h2>
+    <p data-i18n="help.leaveDesc">この端末をグループから切り離し、トップ画面に戻ります。</p>
+    <p class="hint" style="margin-bottom:0;" data-i18n="help.leaveHint">グループ自体のデータは削除されません。他のメンバーはそのまま同じグループを使い続けられます。新しく別の旅行を始めたいときにお使いください。</p>
   </div>
 
   <div class="card">
-    <h2>📱 対応環境・注意事項</h2>
-    <p>
-      ・音声入力は<b>Google Chrome / Microsoft Edge</b>（PC・Android・iOS）で利用できます。それ以外のブラウザではマイクボタンが自動的に無効になりますが、手入力で通常通り使えます。<br>
-      ・グループコードを知っている人は誰でもそのグループのデータを読み書きできます。パスワードや個人情報の代わりにはならないため、知らない人にコードを教えないようにしてください。<br>
-      ・通信環境がない場所では、支払いの記録・同期ができません。
-    </p>
+    <h2 data-i18n="help.envTitle">📱 対応環境・注意事項</h2>
+    <p data-i18n-html="help.envDesc">・音声入力は<b>Google Chrome / Microsoft Edge</b>（PC・Android・iOS）で利用できます。それ以外のブラウザではマイクボタンが自動的に無効になりますが、手入力で通常通り使えます。<br>・グループコードを知っている人は誰でもそのグループのデータを読み書きできます。パスワードや個人情報の代わりにはならないため、知らない人にコードを教えないようにしてください。<br>・通信環境がない場所では、支払いの記録・同期ができません。</p>
   </div>
 
-  <a href="index.html" class="primary-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px;">◀ アプリに戻る</a>
+  <a href="index.html" class="primary-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px;" data-i18n="help.backBtn">◀ アプリに戻る</a>
 
 </div>
+<script src="lang.js"></script>
 </body>
 </html>

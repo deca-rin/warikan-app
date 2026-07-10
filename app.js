@@ -1,9 +1,11 @@
 (function () {
   "use strict";
 
+  var t = window.WarikanLang.t;
+
   // ---- 状態 ----
-  let members = []; // [{ name }]
-  let expenses = []; // [{ payerIndex, amount, memo, participants: [memberIndex, ...] }]
+  let members = [];
+  let expenses = [];
   let roomCode = null;
 
   // ---- グループ同期（Firebase Realtime Database） ----
@@ -69,7 +71,7 @@
   function setupMicButton(button) {
     if (!SpeechRecognitionCtor) {
       button.disabled = true;
-      button.title = "このブラウザは音声入力に対応していません";
+      button.title = t("mic.unsupported");
       return;
     }
 
@@ -79,7 +81,7 @@
       const numeric = button.getAttribute("data-numeric") === "true";
 
       const recognition = new SpeechRecognitionCtor();
-      recognition.lang = "ja-JP";
+      recognition.lang = t("speechLang");
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
 
@@ -142,7 +144,7 @@
       }
       enterRoom(code);
     } catch (e) {
-      alert("接続に失敗しました。通信状況を確認してもう一度お試しください。");
+      alert(t("error.connection"));
     } finally {
       joinGroupBtn.disabled = false;
     }
@@ -152,7 +154,7 @@
     if (!roomCode) return;
     navigator.clipboard.writeText(roomCode).then(() => {
       const original = copyRoomCodeBtn.textContent;
-      copyRoomCodeBtn.textContent = "✅ コピーしました";
+      copyRoomCodeBtn.textContent = t("copied");
       setTimeout(() => {
         copyRoomCodeBtn.textContent = original;
       }, 1500);
@@ -191,7 +193,7 @@
       row.className = "name-input-row";
 
       const label = document.createElement("label");
-      label.textContent = `メンバー${i + 1}`;
+      label.textContent = `${t("memberDefault")}${i + 1}`;
 
       const wrap = document.createElement("div");
       wrap.className = "input-with-mic";
@@ -199,13 +201,13 @@
       const input = document.createElement("input");
       input.type = "text";
       input.id = `member-name-${i}`;
-      input.placeholder = `名前を入力`;
+      input.placeholder = t("ph.name");
 
       const micBtn = document.createElement("button");
       micBtn.type = "button";
       micBtn.className = "mic-btn";
       micBtn.setAttribute("data-target", input.id);
-      micBtn.title = "音声で名前を入力";
+      micBtn.title = t("mic.voiceName");
       micBtn.textContent = "🎤";
 
       wrap.appendChild(input);
@@ -228,7 +230,7 @@
     const names = [];
     for (let i = 0; i < count; i++) {
       const input = document.getElementById(`member-name-${i}`);
-      const name = input.value.trim() || `メンバー${i + 1}`;
+      const name = input.value.trim() || `${t("memberDefault")}${i + 1}`;
       names.push(name);
     }
     const newMembers = names.map((name) => ({ name }));
@@ -238,7 +240,7 @@
       const code = await window.WarikanSync.createRoom(newMembers);
       enterRoom(code);
     } catch (e) {
-      alert("グループの作成に失敗しました。通信状況を確認してもう一度お試しください。");
+      alert(t("error.createGroup"));
     } finally {
       toMainBtn.disabled = false;
     }
@@ -344,7 +346,7 @@
         micBtn.type = "button";
         micBtn.className = "mic-btn";
         micBtn.setAttribute("data-target", input.id);
-        micBtn.title = "音声で名前を入力";
+        micBtn.title = t("mic.voiceName");
         micBtn.textContent = "🎤";
 
         wrap.appendChild(input);
@@ -393,7 +395,7 @@
         const participantsSpan = document.createElement("span");
         participantsSpan.className = "expense-participants";
         const names = e.participants.map((i) => (members[i] ? members[i].name : "")).filter(Boolean);
-        participantsSpan.textContent = `割り勘: ${names.join("・")}`;
+        participantsSpan.textContent = `${t("split.prefix")} ${names.join("・")}`;
         info.appendChild(participantsSpan);
       }
 
@@ -466,7 +468,7 @@
   confirmAddMemberBtn.addEventListener("click", () => {
     const name = newMemberNameInput.value.trim();
     if (!name) {
-      alert("名前を入力してください");
+      alert(t("error.enterName"));
       return;
     }
     members.push({ name });
@@ -488,11 +490,11 @@
     );
 
     if (!amount || amount <= 0) {
-      alert("金額を正しく入力してください");
+      alert(t("error.enterAmount"));
       return;
     }
     if (participants.length === 0) {
-      alert("割り勘対象を1人以上選択してください");
+      alert(t("error.selectParticipant"));
       return;
     }
 
@@ -507,7 +509,7 @@
   });
 
   document.getElementById("reset-app").addEventListener("click", () => {
-    if (!confirm("グループから抜けて最初からやり直しますか？（グループのデータ自体は削除されません）")) return;
+    if (!confirm(t("confirm.reset"))) return;
     window.WarikanSync.unsubscribeRoom();
     members = [];
     expenses = [];
@@ -524,7 +526,7 @@
     expenses.forEach((e) => {
       const participants = e.participants && e.participants.length > 0 ? e.participants : members.map((_, i) => i);
       const base = Math.floor(e.amount / participants.length);
-      const remainder = e.amount % participants.length; // 先頭 remainder 人が +1円 負担して端数調整
+      const remainder = e.amount % participants.length;
       participants.forEach((memberIndex, pos) => {
         shares[memberIndex] += base + (pos < remainder ? 1 : 0);
       });
@@ -541,7 +543,7 @@
       settlementResult.hidden = false;
       settlementList.innerHTML = "";
       noSettlementMsg.hidden = false;
-      noSettlementMsg.textContent = "支出がありません";
+      noSettlementMsg.textContent = t("settlement.noExpenses");
       return;
     }
 
@@ -581,17 +583,26 @@
 
     if (transactions.length === 0) {
       noSettlementMsg.hidden = false;
-      noSettlementMsg.textContent = "清算の必要はありません";
+      noSettlementMsg.textContent = t("settlement.notNeeded");
     } else {
       noSettlementMsg.hidden = true;
-      transactions.forEach((t) => {
+      transactions.forEach((tx) => {
         const li = document.createElement("li");
-        li.innerHTML = `<span>${t.from}</span><span class="arrow">→</span><span>${t.to}</span><span class="settle-amount">¥${t.amount.toLocaleString()}</span>`;
+        li.innerHTML = `<span>${tx.from}</span><span class="arrow">→</span><span>${tx.to}</span><span class="settle-amount">¥${tx.amount.toLocaleString()}</span>`;
         settlementList.appendChild(li);
       });
     }
 
     settlementResult.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ---- 言語切替時に動的コンテンツを再描画 ----
+  document.addEventListener("langchange", () => {
+    t = window.WarikanLang.t;
+    if (roomCode) {
+      renderExpenses();
+      settlementResult.hidden = true;
+    }
   });
 
   // ---- 起動時に前回参加していたグループへ自動再接続 ----

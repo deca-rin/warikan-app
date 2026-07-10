@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-i18n-title="page.title">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,54 +13,60 @@
 <div class="app">
 
   <header class="app-header">
-    <h1><span class="emoji-wobble">🐷</span> わりかんアプリ <span class="emoji-wobble">💕</span></h1>
+    <div class="header-row">
+      <h1><span class="emoji-wobble">🐷</span> <span data-i18n="app.title">わりかんアプリ</span> <span class="emoji-wobble">💕</span></h1>
+      <select id="lang-select" class="lang-select">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
+    </div>
   </header>
 
   <!-- 画面0: グループ作成/参加 -->
   <section id="screen-start" class="screen active">
     <div class="card">
-      <h2>🆕 新しいグループを作る</h2>
-      <p class="hint">これから割り勘するメンバーを設定します</p>
-      <button type="button" class="primary-btn" id="create-group-btn">新しいグループを作る ▶</button>
+      <h2 data-i18n="start.createTitle">🆕 新しいグループを作る</h2>
+      <p class="hint" data-i18n="start.createHint">これから割り勘するメンバーを設定します</p>
+      <button type="button" class="primary-btn" id="create-group-btn" data-i18n="start.createBtn">新しいグループを作る ▶</button>
     </div>
     <div class="card">
-      <h2>🔑 招待コードで参加する</h2>
-      <p class="hint">友達から教えてもらったグループコードを入力してください</p>
+      <h2 data-i18n="start.joinTitle">🔑 招待コードで参加する</h2>
+      <p class="hint" data-i18n="start.joinHint">友達から教えてもらったグループコードを入力してください</p>
       <div class="input-with-mic">
-        <input type="text" id="join-code-input" placeholder="例：AB12CD">
-        <button type="button" class="mic-btn" data-target="join-code-input" title="音声でコードを入力">🎤</button>
+        <input type="text" id="join-code-input" data-i18n-placeholder="ph.code" placeholder="例：AB12CD">
+        <button type="button" class="mic-btn" data-target="join-code-input" data-i18n-title="mic.voiceCode" title="音声でコードを入力">🎤</button>
       </div>
-      <button type="button" class="secondary-btn" id="join-group-btn">参加する</button>
-      <p class="hint" id="join-error-msg" hidden>そのコードのグループが見つかりませんでした</p>
+      <button type="button" class="secondary-btn" id="join-group-btn" data-i18n="start.joinBtn">参加する</button>
+      <p class="hint" id="join-error-msg" hidden data-i18n="start.joinError">そのコードのグループが見つかりませんでした</p>
     </div>
-    <a href="help.html" class="secondary-btn" style="display:block; text-align:center; text-decoration:none;">❓ 使い方</a>
+    <a href="help.html" class="secondary-btn" style="display:block; text-align:center; text-decoration:none;" data-i18n="start.helpBtn">❓ 使い方</a>
   </section>
 
   <!-- 画面1: 人数選択 -->
   <section id="screen-count" class="screen">
-    <h2><span class="step-badge">STEP 1</span> 👥 メンバー人数を選択</h2>
+    <h2><span class="step-badge">STEP 1</span> <span data-i18n="count.title">👥 メンバー人数を選択</span></h2>
     <div class="count-row">
       <button type="button" class="stepper" id="count-minus">−</button>
       <div class="count-input-wrap">
         <input type="number" id="member-count" min="2" max="20" value="2" inputmode="numeric">
-        <button type="button" class="mic-btn" data-target="member-count" data-numeric="true" title="音声で人数を入力">🎤</button>
+        <button type="button" class="mic-btn" data-target="member-count" data-numeric="true" data-i18n-title="mic.voiceAmount" title="音声で人数を入力">🎤</button>
       </div>
       <button type="button" class="stepper" id="count-plus">＋</button>
     </div>
-    <p class="hint">人数を数字で発音してください（例：「4」）</p>
+    <p class="hint" data-i18n="count.hint">人数を数字で発音してください（例：「4」）</p>
     <div class="nav-row">
-      <button type="button" class="secondary-btn" id="back-to-start">◀ 戻る</button>
-      <button type="button" class="primary-btn" id="to-names">次へ ▶</button>
+      <button type="button" class="secondary-btn" id="back-to-start" data-i18n="nav.back">◀ 戻る</button>
+      <button type="button" class="primary-btn" id="to-names" data-i18n="nav.next">次へ ▶</button>
     </div>
   </section>
 
   <!-- 画面2: メンバー名入力 -->
   <section id="screen-names" class="screen">
-    <h2><span class="step-badge">STEP 2</span> ✏️ メンバーの名前を入力</h2>
+    <h2><span class="step-badge">STEP 2</span> <span data-i18n="names.title">✏️ メンバーの名前を入力</span></h2>
     <div id="name-inputs" class="name-inputs"></div>
     <div class="nav-row">
-      <button type="button" class="secondary-btn" id="back-to-count">◀ 戻る</button>
-      <button type="button" class="primary-btn" id="to-main">はじめる 🚀</button>
+      <button type="button" class="secondary-btn" id="back-to-count" data-i18n="nav.back">◀ 戻る</button>
+      <button type="button" class="primary-btn" id="to-main" data-i18n="names.start">はじめる 🚀</button>
     </div>
   </section>
 
@@ -69,84 +75,85 @@
     <div class="card room-code-card">
       <div class="room-code-row">
         <div>
-          <div class="room-code-label">グループコード</div>
+          <div class="room-code-label" data-i18n="main.roomCodeLabel">グループコード</div>
           <div class="room-code-value" id="room-code-display">------</div>
         </div>
-        <button type="button" class="chip-btn" id="copy-room-code-btn">📋 コピー</button>
+        <button type="button" class="chip-btn" id="copy-room-code-btn" data-i18n="main.copyBtn">📋 コピー</button>
       </div>
-      <p class="hint">このコードを友達に伝えると、みんなの支払いがリアルタイムで共有されます</p>
+      <p class="hint" data-i18n="main.roomCodeHint">このコードを友達に伝えると、みんなの支払いがリアルタイムで共有されます</p>
     </div>
 
     <div class="card">
-      <h2>💰 支払いを記録</h2>
+      <h2 data-i18n="main.expenseTitle">💰 支払いを記録</h2>
       <div class="form-row">
-        <label for="payer-select">支払った人</label>
+        <label for="payer-select" data-i18n="main.payerLabel">支払った人</label>
         <select id="payer-select"></select>
       </div>
       <div class="form-row">
-        <label for="amount-input">金額（円）</label>
+        <label for="amount-input" data-i18n="main.amountLabel">金額（円）</label>
         <div class="input-with-mic">
-          <input type="number" id="amount-input" min="0" inputmode="numeric" placeholder="例：3000">
-          <button type="button" class="mic-btn" data-target="amount-input" data-numeric="true" title="音声で金額を入力">🎤</button>
+          <input type="number" id="amount-input" min="0" inputmode="numeric" data-i18n-placeholder="ph.amount" placeholder="例：3000">
+          <button type="button" class="mic-btn" data-target="amount-input" data-numeric="true" data-i18n-title="mic.voiceAmount" title="音声で金額を入力">🎤</button>
         </div>
       </div>
       <div class="form-row">
-        <label for="memo-input">内容（任意）</label>
+        <label for="memo-input" data-i18n="main.memoLabel">内容（任意）</label>
         <div class="input-with-mic">
-          <input type="text" id="memo-input" placeholder="例：夕食代">
-          <button type="button" class="mic-btn" data-target="memo-input" title="音声で内容を入力">🎤</button>
+          <input type="text" id="memo-input" data-i18n-placeholder="ph.memo" placeholder="例：夕食代">
+          <button type="button" class="mic-btn" data-target="memo-input" data-i18n-title="mic.voiceContent" title="音声で内容を入力">🎤</button>
         </div>
       </div>
       <div class="form-row">
-        <label>割り勘対象（誰で分ける？）</label>
+        <label data-i18n="main.participantsLabel">割り勘対象（誰で分ける？）</label>
         <div id="participants-list" class="participants-list"></div>
       </div>
-      <button type="button" class="primary-btn" id="add-expense">＋ 追加する</button>
+      <button type="button" class="primary-btn" id="add-expense" data-i18n="main.addExpenseBtn">＋ 追加する</button>
     </div>
 
     <div class="card">
-      <h2>📊 メンバー各自の支払合計</h2>
+      <h2 data-i18n="main.totalsTitle">📊 メンバー各自の支払合計</h2>
       <div class="member-actions">
-        <button type="button" class="chip-btn" id="edit-names-btn">✏️ メンバー名変更</button>
-        <button type="button" class="chip-btn" id="add-member-btn">➕ メンバー追加</button>
+        <button type="button" class="chip-btn" id="edit-names-btn" data-i18n="main.editNamesBtn">✏️ メンバー名変更</button>
+        <button type="button" class="chip-btn" id="add-member-btn" data-i18n="main.addMemberBtn">➕ メンバー追加</button>
       </div>
       <ul id="totals-list" class="totals-list"></ul>
       <div class="nav-row" id="edit-names-actions" hidden>
-        <button type="button" class="secondary-btn" id="cancel-names-btn">キャンセル</button>
-        <button type="button" class="primary-btn" id="save-names-btn">💾 保存</button>
+        <button type="button" class="secondary-btn" id="cancel-names-btn" data-i18n="main.cancelBtn">キャンセル</button>
+        <button type="button" class="primary-btn" id="save-names-btn" data-i18n="main.saveBtn">💾 保存</button>
       </div>
       <div id="add-member-form" hidden>
         <div class="input-with-mic">
-          <input type="text" id="new-member-name" placeholder="新しいメンバーの名前">
-          <button type="button" class="mic-btn" data-target="new-member-name" title="音声で名前を入力">🎤</button>
+          <input type="text" id="new-member-name" data-i18n-placeholder="ph.newMember" placeholder="新しいメンバーの名前">
+          <button type="button" class="mic-btn" data-target="new-member-name" data-i18n-title="mic.voiceName" title="音声で名前を入力">🎤</button>
         </div>
         <div class="nav-row">
-          <button type="button" class="secondary-btn" id="cancel-add-member-btn">キャンセル</button>
-          <button type="button" class="primary-btn" id="confirm-add-member-btn">追加する</button>
+          <button type="button" class="secondary-btn" id="cancel-add-member-btn" data-i18n="main.cancelBtn">キャンセル</button>
+          <button type="button" class="primary-btn" id="confirm-add-member-btn" data-i18n="main.confirmAddBtn">追加する</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>🧾 支払い履歴</h2>
+      <h2 data-i18n="main.historyTitle">🧾 支払い履歴</h2>
       <ul id="expense-list" class="expense-list"></ul>
-      <p id="no-expense-msg" class="hint">まだ支払いが記録されていません</p>
+      <p id="no-expense-msg" class="hint" data-i18n="main.noExpenses">まだ支払いが記録されていません</p>
     </div>
 
     <div class="nav-row">
-      <button type="button" class="secondary-btn" id="reset-app">🔄 グループを抜けて最初から</button>
-      <button type="button" class="primary-btn" id="settle-btn">✨ 清算する</button>
+      <button type="button" class="secondary-btn" id="reset-app" data-i18n="main.resetBtn">🔄 グループを抜けて最初から</button>
+      <button type="button" class="primary-btn" id="settle-btn" data-i18n="main.settleBtn">✨ 清算する</button>
     </div>
-    <a href="help.html" class="chip-btn" style="display:inline-block; text-decoration:none; margin-top:10px;">❓ 使い方</a>
+    <a href="help.html" class="chip-btn" style="display:inline-block; text-decoration:none; margin-top:10px;" data-i18n="main.helpBtn">❓ 使い方</a>
 
     <div class="card" id="settlement-result" hidden>
-      <h2>🎉 清算方法</h2>
+      <h2 data-i18n="main.settlementTitle">🎉 清算方法</h2>
       <ul id="settlement-list" class="settlement-list"></ul>
-      <p id="no-settlement-msg" class="hint" hidden>清算の必要はありません</p>
+      <p id="no-settlement-msg" class="hint" hidden data-i18n="main.noSettlement">清算の必要はありません</p>
     </div>
   </section>
 
 </div>
+<script src="lang.js"></script>
 <script src="firebase-sync.js" type="module"></script>
 <script src="app.js" type="module"></script>
 </body>
