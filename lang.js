@@ -444,14 +444,7 @@
     var titleKey = document.documentElement.dataset.i18nTitle;
     if (titleKey) document.title = t(titleKey);
     var langSelect = document.getElementById("lang-select");
-    if (langSelect) {
-      langSelect.value = currentLang;
-      Object.keys(LANG_NAMES).forEach(function (code) {
-        var opt = langSelect.querySelector('option[value="' + code + '"]');
-        if (!opt) return;
-        opt.textContent = code === currentLang ? "Language" : LANG_NAMES[code];
-      });
-    }
+    if (langSelect) langSelect.value = currentLang;
   }
 
   function init() {
