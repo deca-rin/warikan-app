@@ -56,6 +56,7 @@ body {
 
 .lang-select-wrap {
   align-self: flex-end;
+  position: relative;
 }
 
 .lang-select-label {
