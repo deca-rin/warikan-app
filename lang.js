@@ -444,7 +444,7 @@
     var titleKey = document.documentElement.dataset.i18nTitle;
     if (titleKey) document.title = t(titleKey);
     var langSelect = document.getElementById("lang-select");
-    if (langSelect) langSelect.value = currentLang;
+    if (langSelect) langSelect.value = "";
   }
 
   function init() {
@@ -452,9 +452,9 @@
     applyTranslations();
     var select = document.getElementById("lang-select");
     if (select) {
-      select.value = currentLang;
+      select.value = "";
       select.addEventListener("change", function (e) {
-        setLang(e.target.value);
+        if (e.target.value) setLang(e.target.value);
       });
     }
   }

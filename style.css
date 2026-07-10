@@ -54,33 +54,15 @@ body {
   letter-spacing: 0.5px;
 }
 
-.lang-select-wrap {
-  align-self: flex-end;
-  position: relative;
-}
-
-.lang-select-label {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--primary-dark);
-  pointer-events: none;
-  z-index: 1;
-}
-
 .lang-select {
+  align-self: flex-end;
   width: auto;
   flex: none;
-  min-width: 80px;
   padding: 5px 22px 5px 8px;
   border: 2px solid var(--border);
   border-radius: 12px;
   background: #fff;
-  color: transparent;
+  color: var(--primary-dark);
   font-family: inherit;
   font-size: 11px;
   font-weight: 700;
@@ -91,10 +73,6 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%232f9ae0'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 6px center;
-}
-
-.lang-select option {
-  color: var(--text);
 }
 
 .emoji-wobble {
