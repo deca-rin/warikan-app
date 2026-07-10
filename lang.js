@@ -239,7 +239,18 @@
     var titleKey = document.documentElement.dataset.i18nTitle;
     if (titleKey) document.title = t(titleKey);
     var langSelect = document.getElementById("lang-select");
-    if (langSelect) langSelect.value = currentLang;
+    if (langSelect) {
+      langSelect.value = currentLang;
+      var jaOpt = langSelect.querySelector('option[value="ja"]');
+      var enOpt = langSelect.querySelector('option[value="en"]');
+      if (currentLang === "ja") {
+        if (jaOpt) jaOpt.textContent = "Language";
+        if (enOpt) enOpt.textContent = "English";
+      } else {
+        if (jaOpt) jaOpt.textContent = "日本語";
+        if (enOpt) enOpt.textContent = "言語";
+      }
+    }
   }
 
   function init() {
