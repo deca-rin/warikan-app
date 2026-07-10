@@ -40,9 +40,8 @@ body {
 
 .header-row {
   display: flex;
+  flex-direction: column-reverse;
   align-items: center;
-  justify-content: center;
-  position: relative;
 }
 
 .app-header h1 {
@@ -56,10 +55,8 @@ body {
 }
 
 .lang-select-wrap {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  align-self: flex-end;
+  margin-bottom: -8px;
 }
 
 .lang-select-label {
