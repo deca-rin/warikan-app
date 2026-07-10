@@ -448,7 +448,8 @@
       langSelect.value = currentLang;
       Object.keys(LANG_NAMES).forEach(function (code) {
         var opt = langSelect.querySelector('option[value="' + code + '"]');
-        if (opt) opt.textContent = LANG_NAMES[code];
+        if (!opt) return;
+        opt.textContent = code === currentLang ? "Language" : LANG_NAMES[code];
       });
     }
   }
