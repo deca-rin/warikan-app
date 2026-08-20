@@ -1,4 +1,4 @@
-const CACHE_NAME = "warikan-app-v1";
+const CACHE_NAME = "warikan-app-v2";
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
@@ -33,27 +33,14 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // Firebase等の外部通信はSWを介さない
 
-  if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-          return res;
-        })
-        .catch(() => caches.match(req).then((cached) => cached || caches.match("./index.html")))
-    );
-    return;
-  }
-
+  // ネットワーク優先: 常に最新のファイルを取得し、オフライン時のみキャッシュにフォールバック
   event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((res) => {
+    fetch(req)
+      .then((res) => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
         return res;
-      });
-    })
+      })
+      .catch(() => caches.match(req).then((cached) => cached || (req.mode === "navigate" ? caches.match("./index.html") : undefined)))
   );
 });
