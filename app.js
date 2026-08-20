@@ -7,6 +7,13 @@
   let members = [];
   let expenses = [];
   let roomCode = null;
+  let currency = "JPY";
+
+  const CURRENCY_SYMBOLS = { JPY: "¥", USD: "$", TWD: "NT$", CNY: "CN¥", MYR: "RM", EUR: "€" };
+
+  function formatAmount(amount) {
+    return `${CURRENCY_SYMBOLS[currency] || "¥"}${amount.toLocaleString()}`;
+  }
 
   // ---- グループ同期（Firebase Realtime Database） ----
   const ROOM_STORAGE_KEY = "warikan-app-room-code";
@@ -33,7 +40,7 @@
 
   function syncToFirebase() {
     if (!roomCode) return;
-    window.WarikanSync.updateRoom(roomCode, { members, expenses });
+    window.WarikanSync.updateRoom(roomCode, { members, expenses, currency });
   }
 
   function enterRoom(code) {
@@ -43,6 +50,7 @@
     window.WarikanSync.subscribeRoom(code, (data) => {
       members = Array.isArray(data.members) ? data.members : [];
       expenses = migrateExpenses(members, data.expenses);
+      currency = data.currency || "JPY";
       memberCountInput.value = members.length || 2;
       initMainScreen();
       showScreen("screen-main");
@@ -248,6 +256,7 @@
 
   // ---- 画面3: メイン ----
   const payerSelect = document.getElementById("payer-select");
+  const currencySelect = document.getElementById("currency-select");
   const amountInput = document.getElementById("amount-input");
   const memoInput = document.getElementById("memo-input");
   const participantsListEl = document.getElementById("participants-list");
@@ -310,6 +319,7 @@
 
   function initMainScreen() {
     rebuildPayerSelect();
+    currencySelect.value = currency;
     amountInput.value = "";
     memoInput.value = "";
     settlementResult.hidden = true;
@@ -364,7 +374,7 @@
       nameSpan.textContent = m.name;
       const amountSpan = document.createElement("span");
       amountSpan.className = "amount";
-      amountSpan.textContent = `¥${totals[i].toLocaleString()}`;
+      amountSpan.textContent = formatAmount(totals[i]);
       li.appendChild(nameSpan);
       li.appendChild(amountSpan);
       totalsList.appendChild(li);
@@ -401,7 +411,7 @@
 
       const amountSpan = document.createElement("span");
       amountSpan.className = "expense-amount";
-      amountSpan.textContent = `¥${e.amount.toLocaleString()}`;
+      amountSpan.textContent = formatAmount(e.amount);
 
       const delBtn = document.createElement("button");
       delBtn.type = "button";
@@ -421,6 +431,14 @@
       expenseList.appendChild(li);
     });
   }
+
+  currencySelect.addEventListener("change", () => {
+    currency = currencySelect.value;
+    syncToFirebase();
+    renderTotals();
+    renderExpenses();
+    settlementResult.hidden = true;
+  });
 
   editNamesBtn.addEventListener("click", () => {
     addingMember = false;
@@ -513,6 +531,7 @@
     window.WarikanSync.unsubscribeRoom();
     members = [];
     expenses = [];
+    currency = "JPY";
     roomCode = null;
     forgetRoom();
     memberCountInput.value = 2;
@@ -588,7 +607,7 @@
       noSettlementMsg.hidden = true;
       transactions.forEach((tx) => {
         const li = document.createElement("li");
-        li.innerHTML = `<span>${tx.from}</span><span class="arrow">→</span><span>${tx.to}</span><span class="settle-amount">¥${tx.amount.toLocaleString()}</span>`;
+        li.innerHTML = `<span>${tx.from}</span><span class="arrow">→</span><span>${tx.to}</span><span class="settle-amount">${formatAmount(tx.amount)}</span>`;
         settlementList.appendChild(li);
       });
     }

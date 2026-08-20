@@ -100,7 +100,17 @@
         <select id="payer-select"></select>
       </div>
       <div class="form-row">
-        <label for="amount-input" data-i18n="main.amountLabel">金額（円）</label>
+        <div class="label-with-select">
+          <label for="amount-input" data-i18n="main.amountLabel">金額</label>
+          <select id="currency-select" class="pill-select currency-select" data-i18n-title="main.currencyTitle" title="通貨を選択">
+            <option value="JPY" data-i18n="currency.JPY">日本円</option>
+            <option value="USD" data-i18n="currency.USD">米ドル</option>
+            <option value="TWD" data-i18n="currency.TWD">台湾ドル</option>
+            <option value="CNY" data-i18n="currency.CNY">中国元</option>
+            <option value="MYR" data-i18n="currency.MYR">マレーシアドル</option>
+            <option value="EUR" data-i18n="currency.EUR">ユーロ</option>
+          </select>
+        </div>
         <div class="input-with-mic">
           <input type="number" id="amount-input" min="0" inputmode="numeric" data-i18n-placeholder="ph.amount" placeholder="例：3000">
           <button type="button" class="mic-btn" data-target="amount-input" data-numeric="true" data-i18n-title="mic.voiceAmount" title="音声で金額を入力">🎤</button>
